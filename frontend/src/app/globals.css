@@ -1,89 +1,136 @@
 @import "tailwindcss";
 
-@theme {
-  --color-background: #0a0a0a;
-  --color-foreground: #ededed;
+:root {
+  --color-background: #050505;
+  --color-foreground: #ffffff;
+  --color-accent: #ffffff;
+  color-scheme: dark;
 }
 
 @layer utilities {
   .glass {
-    @apply bg-white/5 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-[0_8px_32px_0_rgba(255,255,255,0.05)];
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
   }
-  .glass-panel {
-    @apply bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-xl;
+  
+  .glass-card {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .neon-text {
-    text-shadow: 0 0 10px rgba(255,255,255,0.3), 0 0 20px rgba(255,255,255,0.1);
+
+  .glass-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
   }
-  .neon-border {
-    box-shadow: 0 0 15px rgba(255,255,255,0.15), inset 0 0 10px rgba(255,255,255,0.05);
+
+  .neon-glow {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
   }
 }
 
 body {
-  background-color: var(--color-background);
-  color: var(--color-foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #050505;
+  color: white;
+  min-height: 100vh;
   overflow-x: hidden;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-.stars-bg {
+/* Premium Animated Background */
+.bg-mesh {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 0% 100%, rgba(255, 255, 255, 0.02) 0%, transparent 50%);
+  z-index: -1;
+}
+
+.stars-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   z-index: -2;
-  background-image: 
-    radial-gradient(1px 1px at 20px 30px, rgba(255,255,255,0.8), rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.6), rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 50px 160px, rgba(255,255,255,0.9), rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.4), rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.7), rgba(0,0,0,0)),
-    radial-gradient(2px 2px at 180px 120px, rgba(255,255,255,0.8), rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 220px 40px, rgba(255,255,255,0.3), rgba(0,0,0,0));
-  background-repeat: repeat;
-  background-size: 300px 300px;
-  animation: moveStars 150s linear infinite;
-  opacity: 0.6;
+  pointer-events: none;
+  background: #050505;
+  overflow: hidden;
 }
 
-/* Ambient white blobs so that the glass effect has something to blur nicely */
-body::before {
-  content: '';
-  position: fixed;
-  top: 10%; right: 10%;
-  width: 50vw; height: 50vh;
-  background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 60%);
-  z-index: -1;
-  pointer-events: none;
-}
-body::after {
-  content: '';
-  position: fixed;
-  bottom: 0; left: 0;
-  width: 60vw; height: 60vh;
-  background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%);
-  z-index: -1;
-  pointer-events: none;
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.3;
+  animation: dynamicStars 150s linear infinite;
 }
 
-@keyframes moveStars {
+@keyframes dynamicStars {
   from { transform: translateY(0); }
-  to { transform: translateY(-300px); }
+  to { transform: translateY(-2000px); }
 }
 
 .comet {
   position: absolute;
   width: 2px;
   height: 2px;
-  background: white;
-  border-radius: 50%;
-  box-shadow: 0 0 10px 2px white, 0 0 20px 2px rgba(255, 255, 255, 0.8), -10px -10px 10px 2px rgba(255, 255, 255, 0.4);
-  animation: cometFall 8s linear infinite;
+  background: linear-gradient(to right, white, transparent);
+  box-shadow: 0 0 10px white;
   opacity: 0;
-  z-index: -1;
+  animation: cometMove 8s infinite ease-out;
 }
 
-@keyframes cometFall {
-  0% { transform: translate(100vw, -10vh); opacity: 1; }
-  10% { transform: translate(-10vw, 100vh); opacity: 0; }
+@keyframes cometMove {
+  0% { transform: translateY(-100px) translateX(100vw) rotate(-45deg); opacity: 0; }
+  10% { opacity: 1; }
+  20% { transform: translateY(100vh) translateX(-100px) rotate(-45deg); opacity: 0; }
   100% { opacity: 0; }
+}
+
+.floating-orb {
+  position: fixed;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.015) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: -1;
+  pointer-events: none;
+  filter: blur(80px);
+  animation: float 20s infinite alternate ease-in-out;
+}
+
+@keyframes float {
+  0% { transform: translate(-10%, -10%); }
+  100% { transform: translate(10%, 10%); }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }

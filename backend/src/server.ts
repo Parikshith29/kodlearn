@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
 import subjectRoutes from './routes/subjects';
 import progressRoutes from './routes/progress';
+import chatRoutes from './routes/chat';
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use(cookieParser());
 app.use('/api/auth', authRoutes);
 app.use('/api/subjects', subjectRoutes);
 app.use('/api/progress', progressRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));

@@ -22,7 +22,7 @@ export default function SubjectPage() {
       <Navbar />
       
       <div className="mb-12">
-        <Link href="/dashboard" className="text-blue-400 hover:text-blue-300 flex items-center gap-2 mb-6 transition-colors w-max font-medium">
+        <Link href="/dashboard/my-courses" className="text-blue-400 hover:text-blue-300 flex items-center gap-2 mb-6 transition-colors w-max font-medium">
           <ChevronLeft size={18} /> Disconnect from Module
         </Link>
         <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-6 tracking-tight neon-text">{subject.title}</h1>

@@ -27,10 +27,12 @@ export default function MyCourses() {
             transition={{ delay: i * 0.1, duration: 0.3 }}
             className="glass group hover:shadow-[0_8px_32px_0_rgba(255,255,255,0.15)] transition-all duration-300 overflow-hidden flex flex-col h-[400px]"
           >
-            <div className="h-48 bg-black/60 relative overflow-hidden shrink-0">
-              {sub.thumbnail_url && (
-                <img src={sub.thumbnail_url} alt={sub.title} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500 scale-100 group-hover:scale-105" />
-              )}
+            <div className="h-48 relative overflow-hidden shrink-0 bg-black/40">
+              <div className={`absolute inset-0 bg-gradient-to-br ${sub.category === 'Frontend' ? 'from-blue-900/80 to-blue-950/80' : sub.category === 'Backend' ? 'from-emerald-900/80 to-emerald-950/80' : sub.category === 'Data' ? 'from-purple-900/80 to-purple-950/80' : sub.category === 'DevOps' ? 'from-orange-900/80 to-orange-950/80' : 'from-gray-800/80 to-gray-900/80'} flex items-center justify-center`}>
+                {sub.thumbnail_url && (
+                  <img src={sub.thumbnail_url} alt={sub.title} className={`w-full h-full object-contain p-10 opacity-90 drop-shadow-2xl group-hover:scale-110 transition-transform duration-500 ${sub.thumbnail_url.includes('nextjs') ? 'invert brightness-200' : ''}`} />
+                )}
+              </div>
             </div>
             <div className="p-6 flex flex-col justify-between flex-1">
               <div>

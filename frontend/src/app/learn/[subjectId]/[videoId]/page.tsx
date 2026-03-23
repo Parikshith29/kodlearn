@@ -5,6 +5,7 @@ import api from '../../../../lib/api';
 import { useParams, useRouter } from 'next/navigation';
 import { CheckCircle, Lock, PlayCircle, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import KodBotSidebar from '../../../../components/KodBotSidebar';
 
 export default function LearnPage() {
   const { subjectId, videoId } = useParams();
@@ -181,6 +182,7 @@ export default function LearnPage() {
           </>
         )}
       </div>
+      <KodBotSidebar />
     </div>
   );
 }
