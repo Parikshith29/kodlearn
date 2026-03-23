@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #0a0a0a;
+  --color-foreground: #ededed;
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/5 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-[0_8px_32px_0_rgba(255,255,255,0.05)];
+  }
+  .glass-panel {
+    @apply bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-xl;
+  }
+  .neon-text {
+    text-shadow: 0 0 10px rgba(255,255,255,0.3), 0 0 20px rgba(255,255,255,0.1);
+  }
+  .neon-border {
+    box-shadow: 0 0 15px rgba(255,255,255,0.15), inset 0 0 10px rgba(255,255,255,0.05);
+  }
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+.stars-bg {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: -2;
+  background-image: 
+    radial-gradient(1px 1px at 20px 30px, rgba(255,255,255,0.8), rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.6), rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 50px 160px, rgba(255,255,255,0.9), rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.4), rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.7), rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 180px 120px, rgba(255,255,255,0.8), rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 220px 40px, rgba(255,255,255,0.3), rgba(0,0,0,0));
+  background-repeat: repeat;
+  background-size: 300px 300px;
+  animation: moveStars 150s linear infinite;
+  opacity: 0.6;
+}
+
+/* Ambient white blobs so that the glass effect has something to blur nicely */
+body::before {
+  content: '';
+  position: fixed;
+  top: 10%; right: 10%;
+  width: 50vw; height: 50vh;
+  background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 60%);
+  z-index: -1;
+  pointer-events: none;
+}
+body::after {
+  content: '';
+  position: fixed;
+  bottom: 0; left: 0;
+  width: 60vw; height: 60vh;
+  background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+@keyframes moveStars {
+  from { transform: translateY(0); }
+  to { transform: translateY(-300px); }
+}
+
+.comet {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 10px 2px white, 0 0 20px 2px rgba(255, 255, 255, 0.8), -10px -10px 10px 2px rgba(255, 255, 255, 0.4);
+  animation: cometFall 8s linear infinite;
+  opacity: 0;
+  z-index: -1;
+}
+
+@keyframes cometFall {
+  0% { transform: translate(100vw, -10vh); opacity: 1; }
+  10% { transform: translate(-10vw, 100vh); opacity: 0; }
+  100% { opacity: 0; }
+}
