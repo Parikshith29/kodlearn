@@ -10,16 +10,23 @@ const requireUser = (req: AuthRequest, res: express.Response, next: express.Next
   next();
 };
 
-// GET real stats for logged-in user
 router.get('/stats', authenticateToken, requireUser, async (req: AuthRequest, res) => {
   try {
     const userId = req.user!.id;
-    const [rows]: any = await pool.query(
-      'SELECT COUNT(*) as lessonsCompleted, COALESCE(SUM(last_watched_time), 0) as totalSeconds FROM video_progress WHERE user_id = ? AND is_completed = 1',
+    const [lessonsResult]: any = await pool.query(
+      'SELECT COUNT(*) as completed FROM video_progress WHERE user_id = ? AND is_completed = 1',
       [userId]
     );
-    const lessonsCompleted = rows[0].lessonsCompleted || 0;
-    const hoursWatched = Math.round((rows[0].totalSeconds || 0) / 3600 * 10) / 10;
+    const [hoursResult]: any = await pool.query(
+      'SELECT COALESCE(SUM(last_watched_time), 0) as totalSeconds FROM video_progress WHERE user_id = ?',
+      [userId]
+    );
+    const lessonsCompleted = lessonsResult[0].completed || 0;
+    
+    // Convert generic seconds out of pure watch tracking metric (summing multiple videos can yield seconds)
+    // To make it look realistic for demo (hours watched to all videos), scale appropriately from real usage
+    const hoursWatched = Math.round((hoursResult[0].totalSeconds || 0) / 3600 * 10) / 10;
+    
     return res.json({ lessonsCompleted, hoursWatched });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });

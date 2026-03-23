@@ -9,8 +9,7 @@ export default function MyCourses() {
   const [subjects, setSubjects] = useState([]);
 
   useEffect(() => {
-    // Simulated enrolled instances for UX flow
-    api.get('/subjects').then(res => setSubjects(res.data.slice(0, 3))).catch(console.error);
+    api.get('/subjects/enrolled').then(res => setSubjects(res.data)).catch(console.error);
   }, []);
 
   return (
@@ -37,13 +36,23 @@ export default function MyCourses() {
             <div className="p-6 flex flex-col justify-between flex-1">
               <div>
                 <h2 className="text-xl font-bold text-white mb-2 line-clamp-2 leading-snug">{sub.title}</h2>
-                <div className="w-full bg-white/5 h-2 rounded-full mt-4 overflow-hidden border border-white/5">
-                    <div className="h-full bg-white shadow-[0_0_10px_white]" style={{ width: `${(i+1)*25}%` }} />
-                </div>
-                <p className="text-gray-400 text-xs mt-3 font-mono">{(i+1)*25}% MODULE UNLOCKED</p>
+                {(() => {
+                  const pct = sub.total_videos > 0 ? Math.round((sub.completed_videos / sub.total_videos) * 100) : 0;
+                  const isDone = pct >= 100;
+                  return (
+                    <>
+                      <div className="w-full bg-white/5 h-2 rounded-full mt-4 overflow-hidden border border-white/5 relative">
+                          <div className={`h-full ${isDone ? 'bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.8)]' : 'bg-white shadow-[0_0_10px_white]'}`} style={{ width: `${pct}%` }} />
+                      </div>
+                      <p className={`text-xs mt-3 font-mono ${isDone ? 'text-green-400' : 'text-gray-400'}`}>
+                        {isDone ? '100% SEQUENCE COMPLETED' : `${pct}% SEQUENCE UNLOCKED`}
+                      </p>
+                    </>
+                  );
+                })()}
               </div>
-              <Link href={`/subjects/${sub.id}`} className="mt-4 flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-white/20 hover:bg-white text-gray-300 hover:text-black font-semibold transition-all group/btn">
-                <Play size={16} className="group-hover/btn:fill-black" /> Resume Module
+              <Link href={`/subjects/${sub.id}`} className={`mt-4 flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-white/20 hover:bg-white text-gray-300 hover:text-black font-semibold transition-all group/btn ${sub.completed_videos >= sub.total_videos ? 'bg-green-500/10 border-green-500/30' : ''}`}>
+                <Play size={16} className="group-hover/btn:fill-black" /> {sub.completed_videos >= sub.total_videos ? 'Review Sequence' : 'Resume Sequence'}
               </Link>
             </div>
           </motion.div>

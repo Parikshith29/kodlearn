@@ -1,6 +1,6 @@
 import express from 'express';
 import { pool } from '../config/db';
-import { authenticateToken } from '../middleware/auth';
+import { authenticateToken, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -14,14 +14,52 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
+// Get enrolled subjects with progress mapped safely under a dedicated endpoint BEFORE :id path collision
+router.get('/enrolled', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    const userId = req.user!.id;
+    const [enrolledSubjects]: any = await pool.query(`
+      SELECT 
+        s.id, s.title, s.description, s.thumbnail_url, s.category,
+        e.created_at as enrolled_at,
+        (SELECT COUNT(v.id) FROM videos v JOIN sections sec ON v.section_id = sec.id WHERE sec.subject_id = s.id) as total_videos,
+        (SELECT COUNT(vp.video_id) FROM video_progress vp JOIN videos v ON vp.video_id = v.id JOIN sections sec ON v.section_id = sec.id WHERE sec.subject_id = s.id AND vp.user_id = ? AND vp.is_completed = 1) as completed_videos
+      FROM subjects s
+      JOIN enrollments e ON e.subject_id = s.id
+      WHERE e.user_id = ?
+      ORDER BY e.created_at DESC
+    `, [userId, userId]);
+
+    res.json(enrolledSubjects);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+router.post('/:id/enroll', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    const userId = req.user!.id;
+    const subjectId = req.params.id;
+    await pool.query('INSERT IGNORE INTO enrollments (user_id, subject_id) VALUES (?, ?)', [userId, subjectId]);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Get subject details with its full tree (sections -> videos)
-router.get('/:id/tree', authenticateToken, async (req, res) => {
+router.get('/:id/tree', authenticateToken, async (req: AuthRequest, res) => {
   try {
     const subjectId = req.params.id;
-    const [subjects]: any = await pool.query('SELECT * FROM subjects WHERE id = ?', [subjectId]);
+    const userId = req.user!.id;
     
+    const [subjects]: any = await pool.query('SELECT * FROM subjects WHERE id = ?', [subjectId]);
     if (subjects.length === 0) return res.status(404).json({ error: 'Subject not found' });
     const subject = subjects[0];
+
+    const [enrollments]: any = await pool.query('SELECT * FROM enrollments WHERE user_id = ? AND subject_id = ?', [userId, subjectId]);
+    subject.is_enrolled = enrollments.length > 0;
 
     const [sections]: any = await pool.query('SELECT * FROM sections WHERE subject_id = ? ORDER BY order_index ASC', [subjectId]);
     

@@ -4,7 +4,7 @@ import api from '../../../lib/api';
 import Navbar from '../../../components/Navbar';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { PlayCircle, ChevronLeft } from 'lucide-react';
+import { PlayCircle, ChevronLeft, Lock, FileCheck } from 'lucide-react';
 import { useParams } from 'next/navigation';
 
 export default function SubjectPage() {
@@ -14,6 +14,15 @@ export default function SubjectPage() {
   useEffect(() => {
     api.get(`/subjects/${id}/tree`).then(res => setSubject(res.data)).catch(console.error);
   }, [id]);
+
+  const handleEnroll = async () => {
+    try {
+      await api.post(`/subjects/${id}/enroll`);
+      setSubject({ ...subject, is_enrolled: true });
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   if (!subject) return <div className="min-h-screen text-white flex items-center justify-center font-mono animate-pulse">Establishing Connection...</div>;
 
@@ -27,6 +36,16 @@ export default function SubjectPage() {
         </Link>
         <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-6 tracking-tight neon-text">{subject.title}</h1>
         <p className="text-lg text-gray-300 max-w-3xl leading-relaxed">{subject.description}</p>
+        
+        {!subject.is_enrolled ? (
+          <button onClick={handleEnroll} className="mt-8 px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl transition-all shadow-[0_0_20px_rgba(59,130,246,0.3)]">
+            Enroll into Sequence
+          </button>
+        ) : (
+          <div className="mt-8 inline-flex items-center gap-2 px-5 py-2.5 bg-green-500/10 text-green-400 font-bold rounded-xl border border-green-500/20">
+            <FileCheck size={18} /> Sequence Active
+          </div>
+        )}
       </div>
 
       <div className="space-y-8">
@@ -48,18 +67,25 @@ export default function SubjectPage() {
             
             <div className="space-y-3 relative z-10">
               {section.videos?.map((vid: any, vIdx: number) => (
-                <Link 
-                  href={`/learn/${subject.id}/${vid.id}`} 
-                  key={vid.id}
-                  className="flex items-center gap-4 p-4 rounded-xl bg-white/5 hover:bg-white/10 hover:neon-border border border-white/5 transition-all group/vid cursor-pointer text-gray-300 hover:text-white"
-                >
-                  <div className="text-blue-500 group-hover/vid:text-blue-400 transition-colors">
-                    <PlayCircle size={24} />
+                subject.is_enrolled ? (
+                  <Link 
+                    href={`/learn/${subject.id}/${vid.id}`} 
+                    key={vid.id}
+                    className="flex items-center gap-4 p-4 rounded-xl bg-white/5 hover:bg-white/10 hover:neon-border border border-white/5 transition-all group/vid cursor-pointer text-gray-300 hover:text-white"
+                  >
+                    <div className="text-blue-500 group-hover/vid:text-blue-400 transition-colors">
+                      <PlayCircle size={24} />
+                    </div>
+                    <div className="flex-1 font-medium text-lg">
+                      {vid.title}
+                    </div>
+                  </Link>
+                ) : (
+                  <div key={vid.id} className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 text-gray-500 opacity-60 cursor-not-allowed">
+                    <Lock size={24} />
+                    <div className="flex-1 font-medium text-lg text-gray-400">{vid.title}</div>
                   </div>
-                  <div className="flex-1 font-medium text-lg">
-                    {vid.title}
-                  </div>
-                </Link>
+                )
               ))}
             </div>
           </motion.div>

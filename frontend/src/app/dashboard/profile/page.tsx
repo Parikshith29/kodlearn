@@ -82,13 +82,6 @@ export default function Profile() {
             <p className="text-gray-500 font-semibold text-sm relative z-10">Hours Watched</p>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
-            className="glass p-7 rounded-3xl border border-white/8 flex-1 flex flex-col justify-center relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-28 h-28 bg-yellow-500/10 rounded-full blur-3xl group-hover:bg-yellow-500/20 transition-all duration-700" />
-            <Trophy size={28} className="text-yellow-400 mb-4 relative z-10" />
-            <h3 className="text-5xl font-black mb-1 relative z-10">0</h3>
-            <p className="text-gray-500 font-semibold text-sm relative z-10">Certifications</p>
-          </motion.div>
         </div>
 
       </div>

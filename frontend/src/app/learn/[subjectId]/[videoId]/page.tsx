@@ -172,9 +172,13 @@ export default function LearnPage() {
                   </Link>
                 ) : <div />}
                 
-                {nextVideo && (
+                {nextVideo ? (
                   <Link href={`/learn/${subjectId}/${nextVideo.id}`} className="flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600/20 hover:bg-blue-600 border border-blue-500/30 text-white transition-all shadow-lg font-medium group">
                     Next Lesson <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                ) : (
+                  <Link href="/dashboard/my-courses" className="flex items-center gap-2 px-6 py-3 rounded-xl bg-green-500/20 hover:bg-green-500 border border-green-500/30 text-green-400 hover:text-white transition-all shadow-lg font-bold group">
+                    Finish Course & Exit <CheckCircle size={18} />
                   </Link>
                 )}
               </div>

@@ -1,4 +1,5 @@
 "use client";
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '../store/authStore';
 import { Home, Compass, BookOpen, User, LogOut, Search, CreditCard, ChevronRight } from 'lucide-react';
@@ -9,8 +10,13 @@ export default function Sidebar() {
   const { user, logout } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const handleLogout = () => {
+    setIsLogoutModalOpen(true);
+  };
+
+  const executeLogout = () => {
     logout();
     router.push('/login');
   };
@@ -23,7 +29,26 @@ export default function Sidebar() {
   ];
 
   return (
-    <motion.div 
+    <>
+      {isLogoutModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md">
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="glass p-8 rounded-3xl max-w-sm w-full text-center border border-white/10 shadow-2xl relative z-10 m-4">
+            <LogOut size={48} className="mx-auto text-red-500 mb-6" />
+            <h2 className="text-2xl font-bold text-white mb-2">Terminate Session?</h2>
+            <p className="text-gray-400 mb-8 text-sm leading-relaxed">Are you sure you want to securely log out of your account?</p>
+            <div className="flex gap-4">
+              <button onClick={() => setIsLogoutModalOpen(false)} className="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium transition-colors">Cancel</button>
+              <button 
+                onClick={executeLogout} 
+                className="flex-1 py-3 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-500 font-medium transition-colors"
+               >
+                Log Out
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+      <motion.div 
       initial={{ x: -100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       className="w-72 h-screen flex flex-col sticky top-0 shrink-0 z-50 p-6"
@@ -100,5 +125,6 @@ export default function Sidebar() {
         </div>
       </div>
     </motion.div>
+    </>
   );
 }
