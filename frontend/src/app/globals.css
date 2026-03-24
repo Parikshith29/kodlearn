@@ -1,66 +1,91 @@
 @import "tailwindcss";
 
 :root {
-  --color-background: #050505;
+  --color-background: #050508;
   --color-foreground: #ffffff;
   --color-accent: #ffffff;
   color-scheme: dark;
+
+  /* Accent colors */
+  --accent-blue: 59, 130, 246;
+  --accent-purple: 139, 92, 246;
+  --accent-cyan: 34, 211, 238;
+  --accent-emerald: 52, 211, 153;
 }
 
 @layer utilities {
   .glass {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.09);
   }
   
   .glass-card {
-    background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    transition: all 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .glass-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  .glass-card:hover::before {
+    opacity: 1;
   }
 
   .glass-card:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.15);
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.18);
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 
+      0 24px 60px rgba(0, 0, 0, 0.6),
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
   }
 
   .neon-glow {
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    box-shadow: 
+      0 0 20px rgba(255, 255, 255, 0.1),
+      0 0 40px rgba(255, 255, 255, 0.05);
   }
 
   .text-glow {
-    text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    text-shadow: 
+      0 0 20px rgba(255, 255, 255, 0.4),
+      0 0 60px rgba(255, 255, 255, 0.2);
+  }
+
+  .hover-lift {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+  }
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
   }
 }
 
+/* ─────────── Base ─────────── */
 body {
-  background: #050505;
+  background: #050508;
   color: white;
   min-height: 100vh;
   overflow-x: hidden;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* Premium Animated Background */
-.bg-mesh {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: 
-    radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
-    radial-gradient(circle at 100% 100%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 0% 100%, rgba(255, 255, 255, 0.02) 0%, transparent 50%);
-  z-index: -1;
-}
-
+/* ─────────── Star Field ─────────── */
 .stars-container {
   position: fixed;
   top: 0;
@@ -69,68 +94,281 @@ body {
   height: 100%;
   z-index: -2;
   pointer-events: none;
-  background: #050505;
+  background: radial-gradient(ellipse at 50% 0%, #0d0d20 0%, #050508 60%);
   overflow: hidden;
 }
 
+/* Small dim stars — barely visible twinkle */
 .star {
   position: absolute;
-  background: white;
   border-radius: 50%;
-  opacity: 0.3;
-  animation: dynamicStars 150s linear infinite;
+  animation: starTwinkle var(--dur, 4s) ease-in-out infinite alternate;
 }
 
-@keyframes dynamicStars {
-  from { transform: translateY(0); }
-  to { transform: translateY(-2000px); }
-}
-
-.comet {
+/* Bright stars — clearly visible, pulsing */
+.star-bright {
   position: absolute;
-  width: 2px;
-  height: 2px;
-  background: linear-gradient(to right, white, transparent);
-  box-shadow: 0 0 10px white;
-  opacity: 0;
-  animation: cometMove 8s infinite ease-out;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 0 var(--glow, 4px) 1px rgba(255,255,255,0.8);
+  animation: 
+    starTwinkle var(--dur, 3s) ease-in-out infinite alternate,
+    drift var(--drift-dur, 80s) linear infinite;
 }
 
-@keyframes cometMove {
-  0% { transform: translateY(-100px) translateX(100vw) rotate(-45deg); opacity: 0; }
-  10% { opacity: 1; }
-  20% { transform: translateY(100vh) translateX(-100px) rotate(-45deg); opacity: 0; }
+@keyframes starTwinkle {
+  0%   { opacity: var(--min-op, 0.4); transform: scale(1); }
+  50%  { opacity: var(--max-op, 1);   transform: scale(1.4); }
+  100% { opacity: var(--min-op, 0.4); transform: scale(0.9); }
+}
+
+@keyframes drift {
+  from { transform: translateY(0px); }
+  to   { transform: translateY(-30px); }
+}
+
+/* Shooting star */
+.shooting-star {
+  position: absolute;
+  width: 120px;
+  height: 1.5px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.9), transparent);
+  border-radius: 999px;
+  opacity: 0;
+  animation: shoot var(--shoot-dur, 4s) ease-out var(--shoot-delay, 0s) infinite;
+  transform-origin: right center;
+}
+
+@keyframes shoot {
+  0%   { transform: translateX(120px) translateY(-20px) rotate(-30deg); opacity: 0; }
+  5%   { opacity: 1; }
+  40%  { transform: translateX(-200px) translateY(120px) rotate(-30deg); opacity: 0; }
   100% { opacity: 0; }
 }
 
+/* ─────────── Nebula Mesh ─────────── */
+.bg-mesh {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  background: 
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(59, 130, 246, 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 20%, rgba(139, 92, 246, 0.06) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 40% at 50% 90%, rgba(34, 211, 238, 0.04) 0%, transparent 60%);
+}
+
+/* ─────────── Floating Orbs ─────────── */
 .floating-orb {
   position: fixed;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.015) 0%, transparent 70%);
   border-radius: 50%;
   z-index: -1;
   pointer-events: none;
   filter: blur(80px);
-  animation: float 20s infinite alternate ease-in-out;
 }
 
-@keyframes float {
-  0% { transform: translate(-10%, -10%); }
-  100% { transform: translate(10%, 10%); }
+.floating-orb-1 {
+  width: 700px;
+  height: 700px;
+  top: -200px;
+  left: -200px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.09) 0%, transparent 70%);
+  animation: orbFloat1 25s infinite alternate ease-in-out;
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
+.floating-orb-2 {
+  width: 600px;
+  height: 600px;
+  bottom: -150px;
+  right: -150px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+  animation: orbFloat2 30s infinite alternate ease-in-out;
 }
-::-webkit-scrollbar-track {
-  background: transparent;
+
+.floating-orb-3 {
+  width: 400px;
+  height: 400px;
+  top: 40%;
+  left: 40%;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.05) 0%, transparent 70%);
+  animation: orbFloat3 20s infinite alternate ease-in-out;
 }
+
+@keyframes orbFloat1 {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(60px, 40px) scale(1.1); }
+  100% { transform: translate(-40px, 80px) scale(0.95); }
+}
+@keyframes orbFloat2 {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(-50px, -60px) scale(1.05); }
+  100% { transform: translate(30px, -30px) scale(1.1); }
+}
+@keyframes orbFloat3 {
+  0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
+  100% { transform: translate(-80px, 60px) scale(1.2) rotate(180deg); }
+}
+
+/* ─────────── Hover shimmer for interactive cards ─────────── */
+@keyframes shimmer {
+  0%   { transform: translateX(-100%) skewX(-15deg); }
+  100% { transform: translateX(300%) skewX(-15deg); }
+}
+
+.shimmer-card {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+  transform: skewX(-15deg);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.shimmer-card:hover::after {
+  opacity: 1;
+  animation: shimmer 0.7s ease forwards;
+}
+
+/* ─────────── Button pulse ─────────── */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.15), 0 0 20px rgba(255,255,255,0.1); }
+  50%       { box-shadow: 0 0 0 8px rgba(255,255,255,0), 0 0 40px rgba(255,255,255,0.2); }
+}
+.btn-pulse:hover {
+  animation: pulseGlow 1.5s ease-in-out infinite;
+}
+
+/* ─────────── Nav link underline grow ─────────── */
+.nav-link {
+  position: relative;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: rgba(255,255,255,0.6);
+  transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* ─────────── Gradient text animations ─────────── */
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.animated-gradient-text {
+  background: linear-gradient(135deg, #ffffff 0%, #94a3b8 40%, #7c3aed 70%, #ffffff 100%);
+  background-size: 250% 250%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 8s ease infinite;
+}
+
+/* ─────────── Stat counter pulse ─────────── */
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.count-reveal {
+  animation: countUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ─────────── Icon hover spin / bounce ─────────── */
+.icon-hover:hover {
+  animation: iconBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes iconBounce {
+  0%   { transform: scale(1) rotate(0deg); }
+  40%  { transform: scale(1.3) rotate(-8deg); }
+  80%  { transform: scale(0.95) rotate(4deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* ─────────── Page entry ─────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-enter {
+  animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ─────────── Custom Scrollbar ─────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 10px;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
+
+/* ─────────── Loading skeleton pulse ─────────── */
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.06; }
+  50% { opacity: 0.12; }
+}
+.skeleton {
+  animation: skeletonPulse 1.8s ease-in-out infinite;
+  background: rgba(255,255,255,0.08);
+}
+
+/* ─────────── Magnetic button ripple ─────────── */
+@keyframes ripple {
+  0%   { transform: scale(0); opacity: 0.4; }
+  100% { transform: scale(4); opacity: 0; }
+}
+.ripple-effect {
+  position: relative;
+  overflow: hidden;
+}
+.ripple-effect:active::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transform: translate(-50%, -50%) scale(0);
+  animation: ripple 0.5s ease-out forwards;
+}
+
+/* ─────────── Course card accent line ─────────── */
+.card-accent-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(var(--accent-blue), 0.8), rgba(var(--accent-purple), 0.8));
+  border-radius: 0 0 0 inherit;
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.shimmer-card:hover .card-accent-line {
+  width: 100%;
+}
+
+/* ─────────── Focus ring ─────────── */
+*:focus-visible {
+  outline: 2px solid rgba(147,197,253,0.5);
+  outline-offset: 3px;
+  border-radius: 6px;
 }
